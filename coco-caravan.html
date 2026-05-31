@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>coco caravan — leather & beyond</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sand:    #e8dcc8;
+    --earth:   #8b6f47;
+    --dark:    #1c1612;
+    --rust:    #a0522d;
+    --cream:   #f4ede0;
+    --smoke:   #c9b99a;
+    --ink:     #2e2318;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--sand);
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  /* ── Custom cursor ── */
+  #cursor {
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    width: 10px; height: 10px;
+    background: var(--rust);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%,-50%);
+    transition: transform .15s, width .2s, height .2s;
+    mix-blend-mode: difference;
+  }
+  #cursor.big { width: 40px; height: 40px; }
+
+  /* ── Noise overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: .35;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.6rem 3rem;
+    mix-blend-mode: normal;
+  }
+  nav .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    letter-spacing: .25em;
+    text-transform: lowercase;
+    color: var(--sand);
+    text-decoration: none;
+  }
+  nav .logo span { color: var(--rust); }
+  nav ul {
+    list-style: none;
+    display: flex; gap: 2.5rem;
+  }
+  nav ul a {
+    font-family: 'Space Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    text-decoration: none;
+    transition: color .3s;
+  }
+  nav ul a:hover { color: var(--sand); }
+
+  /* ── HERO ── */
+  #hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 3rem 5rem;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 70% 40%, rgba(160,82,45,.18) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 50% at 20% 70%, rgba(139,111,71,.12) 0%, transparent 60%),
+      linear-gradient(160deg, #1c1612 0%, #2e2318 50%, #1a110a 100%);
+  }
+
+  /* Compass rose decoration */
+  .compass {
+    position: absolute; top: 12%; right: 8%;
+    width: 340px; height: 340px;
+    opacity: .07;
+    animation: spinSlow 60s linear infinite;
+  }
+  @keyframes spinSlow { to { transform: rotate(360deg); } }
+
+  .hero-eyebrow {
+    position: relative;
+    font-family: 'Space Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1.2rem;
+    animation: fadeUp .8s .3s both;
+  }
+  .hero-title {
+    position: relative;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    line-height: .92;
+    font-weight: 700;
+    color: var(--cream);
+    animation: fadeUp .9s .5s both;
+  }
+  .hero-title em {
+    display: block;
+    font-style: italic;
+    color: var(--earth);
+  }
+  .hero-sub {
+    position: relative;
+    margin-top: 2rem;
+    max-width: 420px;
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: var(--smoke);
+    font-style: italic;
+    animation: fadeUp .9s .75s both;
+  }
+  .hero-actions {
+    position: relative;
+    margin-top: 2.5rem;
+    display: flex; gap: 1.5rem; align-items: center;
+    animation: fadeUp .9s 1s both;
+  }
+  .btn-primary {
+    display: inline-block;
+    padding: .85rem 2.2rem;
+    background: var(--rust);
+    color: var(--cream);
+    font-family: 'Space Mono', monospace;
+    font-size: .7rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background .3s, transform .2s;
+  }
+  .btn-primary:hover { background: var(--earth); transform: translateY(-2px); }
+  .btn-ghost {
+    font-family: 'Space Mono', monospace;
+    font-size: .7rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    text-decoration: none;
+    border-bottom: 1px solid var(--earth);
+    padding-bottom: 2px;
+    transition: color .3s;
+  }
+  .btn-ghost:hover { color: var(--sand); }
+
+  /* Scroll indicator */
+  .scroll-hint {
+    position: absolute; bottom: 2.5rem; right: 3rem;
+    display: flex; flex-direction: column; align-items: center; gap: .5rem;
+    animation: fadeUp .9s 1.3s both;
+  }
+  .scroll-hint span {
+    font-family: 'Space Mono', monospace;
+    font-size: .55rem;
+    letter-spacing: .2em;
+    color: var(--earth);
+    writing-mode: vertical-lr;
+  }
+  .scroll-line {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, var(--earth), transparent);
+    animation: scrollPulse 2s 2s infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: .4; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    width: 100%; height: 1px;
+    background: linear-gradient(to right, transparent, var(--earth), transparent);
+    opacity: .4;
+    margin: 0 auto;
+  }
+
+  /* ── ABOUT / PHILOSOPHY ── */
+  #about {
+    position: relative;
+    padding: 8rem 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+  .about-label {
+    font-family: 'Space Mono', monospace;
+    font-size: .6rem;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1.5rem;
+  }
+  .about-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.2;
+    color: var(--cream);
+    margin-bottom: 2rem;
+  }
+  .about-headline em { font-style: italic; color: var(--earth); }
+  .about-body {
+    font-size: 1.1rem;
+    line-height: 1.85;
+    color: var(--smoke);
+  }
+  .about-body p + p { margin-top: 1.2rem; }
+
+  /* Stats */
+  .about-stats {
+    display: flex; flex-direction: column; gap: 2.5rem;
+  }
+  .stat {
+    border-left: 2px solid var(--earth);
+    padding-left: 1.5rem;
+  }
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    color: var(--sand);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: .6rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--earth);
+    margin-top: .4rem;
+  }
+  .stat-desc {
+    font-size: .95rem;
+    color: var(--smoke);
+    margin-top: .5rem;
+    font-style: italic;
+  }
+
+  /* ── SERVICES ── */
+  #services {
+    padding: 6rem 3rem;
+    background: linear-gradient(180deg, transparent 0%, rgba(139,111,71,.06) 50%, transparent 100%);
+  }
+  .section-header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+  .section-header .label {
+    font-family: 'Space Mono', monospace;
+    font-size: .6rem;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1rem;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--cream);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .service-card {
+    position: relative;
+    padding: 3.5rem 2.5rem;
+    background: rgba(255,255,255,.02);
+    border: 1px solid rgba(139,111,71,.15);
+    overflow: hidden;
+    transition: background .4s, border-color .4s;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(160,82,45,.08) 0%, transparent 60%);
+    opacity: 0; transition: opacity .4s;
+  }
+  .service-card:hover { background: rgba(160,82,45,.05); border-color: rgba(139,111,71,.4); }
+  .service-card:hover::before { opacity: 1; }
+
+  .service-number {
+    font-family: 'Space Mono', monospace;
+    font-size: .6rem;
+    color: var(--earth);
+    letter-spacing: .2em;
+    margin-bottom: 1.5rem;
+  }
+  .service-icon {
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+    display: block;
+  }
+  .service-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--cream);
+    margin-bottom: 1rem;
+  }
+  .service-title em { font-style: italic; color: var(--earth); }
+  .service-desc {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--smoke);
+  }
+  .service-list {
+    margin-top: 1.5rem;
+    list-style: none;
+  }
+  .service-list li {
+    font-family: 'Space Mono', monospace;
+    font-size: .6rem;
+    letter-spacing: .1em;
+    color: var(--earth);
+    padding: .4rem 0;
+    border-bottom: 1px solid rgba(139,111,71,.15);
+  }
+  .service-list li::before { content: '→  '; }
+
+  /* ── ORDER PROCESS ── */
+  #process {
+    padding: 7rem 3rem;
+  }
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 4rem;
+    position: relative;
+  }
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    top: 1.8rem; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--earth), transparent);
+    opacity: .4;
+  }
+  .step {
+    text-align: center;
+    padding: 0 1.5rem;
+    position: relative;
+  }
+  .step-dot {
+    width: 14px; height: 14px;
+    background: var(--rust);
+    border-radius: 50%;
+    margin: 0 auto 2rem;
+    position: relative;
+    box-shadow: 0 0 0 4px rgba(160,82,45,.2);
+  }
+  .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: .55rem;
+    letter-spacing: .2em;
+    color: var(--earth);
+    margin-bottom: .8rem;
+  }
+  .step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--cream);
+    margin-bottom: .8rem;
+  }
+  .step-desc {
+    font-size: .9rem;
+    color: var(--smoke);
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  /* ── WORKSHOP ── */
+  #workshop {
+    padding: 7rem 3rem;
+    background: linear-gradient(135deg, rgba(28,22,18,1) 0%, rgba(46,35,24,.8) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  #workshop::after {
+    content: 'WORKSHOP';
+    position: absolute; bottom: -1.5rem; right: -1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 12rem;
+    font-weight: 700;
+    color: rgba(139,111,71,.04);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .workshop-inner {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+  .workshop-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    line-height: 1.15;
+    color: var(--cream);
+    margin-bottom: 1.5rem;
+  }
+  .workshop-title em { font-style: italic; color: var(--rust); }
+  .workshop-body {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--smoke);
+    margin-bottom: 2.5rem;
+  }
+  .workshop-features {
+    display: flex; flex-direction: column; gap: 1.2rem;
+  }
+  .wf {
+    display: flex; align-items: flex-start; gap: 1rem;
+  }
+  .wf-icon {
+    width: 32px; height: 32px;
+    border: 1px solid var(--earth);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .9rem;
+    flex-shrink: 0; margin-top: .1rem;
+  }
+  .wf-text strong {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .1em;
+    color: var(--sand);
+    margin-bottom: .25rem;
+  }
+  .wf-text span {
+    font-size: .9rem;
+    color: var(--smoke);
+    font-style: italic;
+  }
+
+  /* Map placeholder */
+  .map-placeholder {
+    background: rgba(139,111,71,.08);
+    border: 1px solid rgba(139,111,71,.2);
+    aspect-ratio: 4/3;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 1rem;
+    color: var(--earth);
+    font-family: 'Space Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .15em;
+    position: relative;
+    overflow: hidden;
+  }
+  .map-placeholder::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 20px,
+      rgba(139,111,71,.03) 20px,
+      rgba(139,111,71,.03) 21px
+    );
+  }
+  .map-icon { font-size: 2.5rem; }
+
+  /* ── ARCHITECTURE ── */
+  #architecture {
+    padding: 7rem 3rem;
+    border-top: 1px solid rgba(139,111,71,.15);
+  }
+  .arch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 5rem;
+    align-items: start;
+    margin-top: 4rem;
+  }
+  .arch-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--cream);
+    border-left: 3px solid var(--rust);
+    padding-left: 2rem;
+  }
+  .arch-body {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--smoke);
+  }
+  .arch-body p + p { margin-top: 1.2rem; }
+  .arch-tags {
+    display: flex; flex-wrap: wrap; gap: .6rem;
+    margin-top: 2rem;
+  }
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: .58rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    border: 1px solid rgba(139,111,71,.4);
+    color: var(--earth);
+    padding: .35rem .9rem;
+  }
+
+  /* ── CONTACT / CTA ── */
+  #contact {
+    padding: 8rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  #contact::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 50%, rgba(160,82,45,.1) 0%, transparent 70%);
+  }
+  .contact-label {
+    font-family: 'Space Mono', monospace;
+    font-size: .6rem;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  .contact-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 1.1;
+    color: var(--cream);
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  .contact-title em { font-style: italic; color: var(--earth); }
+  .contact-body {
+    font-size: 1.1rem;
+    color: var(--smoke);
+    font-style: italic;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+  .contact-actions {
+    display: flex; gap: 1.5rem; justify-content: center;
+    position: relative;
+  }
+
+  /* Contact form inline */
+  .contact-form {
+    max-width: 500px;
+    margin: 3rem auto 0;
+    position: relative;
+    display: flex;
+  }
+  .contact-form input {
+    flex: 1;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(139,111,71,.3);
+    border-right: none;
+    color: var(--sand);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    padding: 1rem 1.5rem;
+    outline: none;
+    transition: border-color .3s;
+  }
+  .contact-form input::placeholder { color: var(--earth); font-style: italic; }
+  .contact-form input:focus { border-color: var(--rust); }
+  .contact-form button {
+    background: var(--rust);
+    border: none;
+    color: var(--cream);
+    font-family: 'Space Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    padding: 0 1.8rem;
+    cursor: none;
+    transition: background .3s;
+  }
+  .contact-form button:hover { background: var(--earth); }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 3rem 3rem;
+    border-top: 1px solid rgba(139,111,71,.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    letter-spacing: .15em;
+    color: var(--earth);
+  }
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: .55rem;
+    letter-spacing: .15em;
+    color: rgba(139,111,71,.5);
+  }
+  .footer-links {
+    display: flex; gap: 2rem; list-style: none;
+  }
+  .footer-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: .55rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--earth);
+    text-decoration: none;
+    transition: color .3s;
+  }
+  .footer-links a:hover { color: var(--sand); }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    nav { padding: 1.2rem 1.5rem; }
+    nav ul { display: none; }
+    #hero { padding: 0 1.5rem 4rem; }
+    #about, .services-grid, .process-steps,
+    .workshop-inner, .arch-grid { grid-template-columns: 1fr; gap: 3rem; }
+    #about, #services, #process, #workshop, #architecture, #contact { padding: 5rem 1.5rem; }
+    .process-steps::before { display: none; }
+    footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+    #workshop::after { font-size: 5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">coco <span>caravan</span></a>
+  <ul>
+    <li><a href="#about">philosophy</a></li>
+    <li><a href="#services">services</a></li>
+    <li><a href="#workshop">workshop</a></li>
+    <li><a href="#architecture">architecture</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+
+  <!-- Compass rose SVG -->
+  <svg class="compass" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="100" r="95" stroke="#c9b99a" stroke-width=".5"/>
+    <circle cx="100" cy="100" r="70" stroke="#c9b99a" stroke-width=".5"/>
+    <circle cx="100" cy="100" r="45" stroke="#c9b99a" stroke-width=".5"/>
+    <line x1="100" y1="5" x2="100" y2="195" stroke="#c9b99a" stroke-width=".5"/>
+    <line x1="5" y1="100" x2="195" y2="100" stroke="#c9b99a" stroke-width=".5"/>
+    <line x1="32" y1="32" x2="168" y2="168" stroke="#c9b99a" stroke-width=".3"/>
+    <line x1="168" y1="32" x2="32" y2="168" stroke="#c9b99a" stroke-width=".3"/>
+    <polygon points="100,8 95,30 100,26 105,30" fill="#c9b99a"/>
+    <polygon points="100,192 95,170 100,174 105,170" fill="#c9b99a" opacity=".5"/>
+    <polygon points="8,100 30,95 26,100 30,105" fill="#c9b99a" opacity=".5"/>
+    <polygon points="192,100 170,95 174,100 170,105" fill="#c9b99a" opacity=".5"/>
+    <text x="100" y="20" text-anchor="middle" font-family="serif" font-size="8" fill="#c9b99a">N</text>
+    <text x="100" y="188" text-anchor="middle" font-family="serif" font-size="8" fill="#c9b99a" opacity=".5">S</text>
+    <text x="186" y="104" text-anchor="middle" font-family="serif" font-size="8" fill="#c9b99a" opacity=".5">E</text>
+    <text x="14" y="104" text-anchor="middle" font-family="serif" font-size="8" fill="#c9b99a" opacity=".5">W</text>
+  </svg>
+
+  <p class="hero-eyebrow">leather · workshop · architecture</p>
+  <h1 class="hero-title">
+    coco<br><em>caravan</em>
+  </h1>
+  <p class="hero-sub">革を持って、世界を旅するように。<br>One leather. One journey. Every piece, a map of where you've been.</p>
+  <div class="hero-actions">
+    <a href="#services" class="btn-primary">Explore</a>
+    <a href="#contact" class="btn-ghost">Order your piece →</a>
+  </div>
+
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div>
+    <p class="about-label">/ philosophy</p>
+    <h2 class="about-headline">旅するように、<br>革と<em>生きる</em></h2>
+    <div class="about-body">
+      <p>キャラバンはただ移動するのではなく、その土地の空気を、出会いを、記憶を革に刻んでいく。coco caravanは旅人であり、職人であり、建築家でもある。</p>
+      <p>世界中を旅しながら、その土地でワークショップを開き、フルオーダーで革製品を作る。ひとつひとつに物語がある。あなたの革は、あなただけの地図になる。</p>
+    </div>
+  </div>
+  <div class="about-stats">
+    <div class="stat">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Full Order</div>
+      <div class="stat-desc">すべての製品はオーダーメイド。あなたの形、あなたの色、あなたの革。</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">∞</div>
+      <div class="stat-label">Destinations</div>
+      <div class="stat-desc">キャラバンは止まらない。次の土地で、次のワークショップを。</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">3</div>
+      <div class="stat-label">Disciplines</div>
+      <div class="stat-desc">革製品 × ワークショップ × 建築設計。すべてがひとつの旅。</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header">
+    <p class="label">/ what we do</p>
+    <h2>Three ways<br>to travel with leather</h2>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <p class="service-number">01</p>
+      <span class="service-icon">🧵</span>
+      <h3 class="service-title">Full<em> Order</em></h3>
+      <p class="service-desc">あなただけの革製品を、ゼロから作る。サイズ、革の種類、縫い目、金具──すべてをあなたが決める。完成品はあなたの旅の相棒になる。</p>
+      <ul class="service-list">
+        <li>財布・名刺入れ・キーホルダー</li>
+        <li>バッグ・トートバッグ・ポーチ</li>
+        <li>ベルト・ストラップ</li>
+        <li>その他カスタムオーダー</li>
+      </ul>
+    </div>
+    <div class="service-card">
+      <p class="service-number">02</p>
+      <span class="service-icon">🗺</span>
+      <h3 class="service-title">Workshop<em> on the Road</em></h3>
+      <p class="service-desc">その土地で、その人たちと、革に触れる時間を作る。初めての人でも大丈夫。革の感触、縫う喜び、作る時間──それ自体が旅の記憶になる。</p>
+      <ul class="service-list">
+        <li>初心者向け革小物ワークショップ</li>
+        <li>カフェ・ギャラリーへの出張開催</li>
+        <li>イベント・マルシェ出店</li>
+        <li>オーダーワークショップ（グループ）</li>
+      </ul>
+    </div>
+    <div class="service-card">
+      <p class="service-number">03</p>
+      <span class="service-icon">📐</span>
+      <h3 class="service-title">Architecture<em> & Space</em></h3>
+      <p class="service-desc">建築学生として培った空間へのまなざしを、設計やデザインに活かす。革が旅するように、建築も人の生活に深く入り込んでいく。</p>
+      <ul class="service-list">
+        <li>建築設計・設計補助</li>
+        <li>空間デザイン・インテリア提案</li>
+        <li>プレゼン資料・ドローイング制作</li>
+        <li>コンペ参加・コラボレーション</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-header">
+    <p class="label">/ order process</p>
+    <h2>How your piece<br>comes to life</h2>
+  </div>
+  <div class="process-steps">
+    <div class="step">
+      <div class="step-dot"></div>
+      <p class="step-num">STEP 01</p>
+      <h4 class="step-title">Contact</h4>
+      <p class="step-desc">フォームかInstagramからメッセージを。どんな革が欲しいか、イメージを自由に教えてください。</p>
+    </div>
+    <div class="step">
+      <div class="step-dot"></div>
+      <p class="step-num">STEP 02</p>
+      <h4 class="step-title">Design</h4>
+      <p class="step-desc">革の種類・色・サイズ・金具を一緒に決める。スケッチや写真を見せてもらえると嬉しいです。</p>
+    </div>
+    <div class="step">
+      <div class="step-dot"></div>
+      <p class="step-num">STEP 03</p>
+      <h4 class="step-title">Craft</h4>
+      <p class="step-desc">一針一針、手縫いで丁寧に仕上げる。製作期間は内容により2〜8週間ほど。</p>
+    </div>
+    <div class="step">
+      <div class="step-dot"></div>
+      <p class="step-num">STEP 04</p>
+      <h4 class="step-title">Deliver</h4>
+      <p class="step-desc">完成品は直接手渡しか配送で。使い込むほどに育つ革の旅が始まります。</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- WORKSHOP -->
+<section id="workshop">
+  <div class="workshop-inner">
+    <div>
+      <p class="about-label">/ workshop on the road</p>
+      <h2 class="workshop-title">その土地で、<br>革に<em>触れる</em></h2>
+      <p class="workshop-body">coco caravanのワークショップは、固定の場所を持たない。カフェでも、ギャラリーでも、野外でも。呼んでもらえれば、革道具を持ってどこへでも行く。<br><br>初めての人が「作れた」と笑う瞬間が、一番好きな瞬間。</p>
+      <div class="workshop-features">
+        <div class="wf">
+          <div class="wf-icon">⏱</div>
+          <div class="wf-text">
+            <strong>Duration: 2〜3 hours</strong>
+            <span>財布・コインケース・キーホルダーなど小物が中心。初心者歓迎。</span>
+          </div>
+        </div>
+        <div class="wf">
+          <div class="wf-icon">📍</div>
+          <div class="wf-text">
+            <strong>Anywhere in Japan（& beyond）</strong>
+            <span>旅先でのゲリラ開催あり。Instagramで最新情報をチェック。</span>
+          </div>
+        </div>
+        <div class="wf">
+          <div class="wf-icon">👥</div>
+          <div class="wf-text">
+            <strong>Group & Private</strong>
+            <span>友人グループでの貸し切り開催も歓迎。人数・内容は相談可。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="map-placeholder">
+      <span class="map-icon">🧭</span>
+      <span>next workshop: TBA</span>
+      <span>— follow on instagram —</span>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <div class="section-header">
+    <p class="label">/ architecture & space</p>
+    <h2>Where craft meets<br>built space</h2>
+  </div>
+  <div class="arch-grid">
+    <div class="arch-quote">
+      "革も建築も、人の時間が積み重なって、はじめて本当の姿になる。"
+    </div>
+    <div>
+      <div class="arch-body">
+        <p>建築学生として培ってきた空間への感性と、革職人としての手仕事のまなざしは、実は同じ根を持っている。スケールは違えど、素材と向き合い、使う人を想像し、時間を重ねてはじめて完成するという点で。</p>
+        <p>建築の仕事もcoco caravanの旅の一部。設計補助から空間提案、プレゼン制作まで、できることを積み重ねながら動いています。コラボや相談、お気軽に。</p>
+      </div>
+      <div class="arch-tags">
+        <span class="tag">建築設計</span>
+        <span class="tag">空間デザイン</span>
+        <span class="tag">インテリア</span>
+        <span class="tag">ドローイング</span>
+        <span class="tag">模型制作</span>
+        <span class="tag">設計補助</span>
+        <span class="tag">プレゼン資料</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="contact-label">/ get in touch</p>
+  <h2 class="contact-title">Let's make<br>something<em> together</em></h2>
+  <p class="contact-body">革のオーダー、ワークショップの依頼、建築の相談、なんでも。<br>キャラバンはいつでも、次の出会いを待っています。</p>
+  <div class="contact-actions">
+    <a href="mailto:hello@coco-caravan.jp" class="btn-primary">Send a message</a>
+    <a href="https://www.instagram.com/coco_suono/" target="_blank" class="btn-ghost">Instagram @coco_suono →</a>
+  </div>
+  <div class="contact-form">
+    <input type="email" placeholder="your email address...">
+    <button type="button">Subscribe</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">coco caravan</div>
+  <ul class="footer-links">
+    <li><a href="#services">leather</a></li>
+    <li><a href="#workshop">workshop</a></li>
+    <li><a href="#architecture">architecture</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+  <p class="footer-copy">© 2026 coco caravan. crafted on the road.</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+  });
+
+  // Fade-in on scroll
+  // Only animate if IntersectionObserver is supported
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: .05 });
+
+    document.querySelectorAll(
+      '.service-card, .step, .stat, .wf, .arch-quote, .tag'
+    ).forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity .7s ease, transform .7s ease';
+      observer.observe(el);
+    });
+  }
+</script>
+</body>
+</html>
